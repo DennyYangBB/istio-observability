@@ -1,0 +1,8 @@
+namespace: bookinfo-dev
+
+resources:
+  - namespace.yaml
+  - ../../base/details/
+  - ../../base/productpage/
+  - ../../base/ratings/
+  - ../../base/reviews/

@@ -1,0 +1,6 @@
+resources:
+  - ./service-account.yaml
+  - ./deployment.yaml
+  - ./deployment-v2.yaml
+  - ./deployment-v3.yaml
+  - ./service.yaml
