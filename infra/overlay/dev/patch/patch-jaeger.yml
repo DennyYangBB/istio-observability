@@ -1,0 +1,43 @@
+- op: add
+  path: /spec/template/spec/containers/0/resources
+  value:
+    requests:
+      cpu: "10m"
+      memory: "200Mi"
+    limits:
+      cpu: "300m"
+      memory: "200Mi"
+
+- op: add
+  path: /spec/template/spec/containers/0/startupProbe
+  value:
+    httpGet:
+      path: /
+      port: 14269
+    initialDelaySeconds: 15
+    failureThreshold: 5
+    periodSeconds: 8
+
+- op: add
+  path: /spec/template/spec/containers/0/livenessProbe
+  value:
+    httpGet:
+      path: /
+      port: 14269
+    initialDelaySeconds: 10
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+
+- op: add
+  path: /spec/template/spec/containers/0/readinessProbe
+  value:
+    httpGet:
+      path: /
+      port: 14269
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+    successThreshold: 1

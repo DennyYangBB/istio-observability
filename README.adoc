@@ -1,0 +1,155 @@
+:source-highlighter: highlightjs
+
+A simple example to demonstrate Istio and observability features in a Kubernetes environment.
+
+== Install CLI
+
+.Install istioctl
+----
+curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.25.0 TARGET_ARCH=x86_64 sh -
+cp istio*/bin/istioctl /usr/local/bin
+rm istio* -r
+----
+
+.Install skaffold and kustomize
+----
+curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && sudo install skaffold /usr/local/bin/ && rm skaffold
+curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash && mv kustomize /usr/local/bin
+----
+
+== Install Metallb Environment (Optional)
+
+.Install Metallb
+----
+kubectl create ns metallb-system
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/main/config/manifests/metallb-native.yaml -n metallb-system
+----
+
+.Setup the IP range
+----
+kubectl apply -f - <<EOF
+include::manifest/metallb/ip-address-pool.yml[]
+---
+include::manifest/metallb/l2-advertisement.yml[]
+EOF
+----
+
+./etc/hosts
+----
+192.168.1.200 bookinfo.example.com kiali.example.com grafana.example.com jaeger.example.com prometheus.example.com
+----
+
+== Install Istio Environment
+
+.Install Istio
+----
+kubectl create ns istio-system
+istioctl install --set meshConfig.accessLogFile=/dev/stdout -y
+----
+
+.Create secret test-tls for https-gateway
+----
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /tmp/tls.key -out /tmp/tls.crt -subj "/CN=*.example.com"
+kubectl create secret tls test-tls --cert=/tmp/tls.crt --key=/tmp/tls.key -n istio-system
+----
+
+.Gateway
+----
+kubectl apply -f - <<EOF
+include::manifest/istio/gateway.yml[]
+EOF
+----
+
+.Telemetry
+----
+kubectl apply -f - <<EOF
+include::manifest/tracing/telemetry.yml[]
+EOF
+----
+
+.IstioOperator
+----
+istioctl install -y -f - <<EOF
+include::manifest/tracing/istio-operator.yml[]
+EOF
+----
+
+== Run
+
+.Deploy infra - workdir: infra
+[source,shell]
+----
+skaffold run
+----
+
+.Apply virtual service
+[source,shell]
+----
+kubectl apply -f - <<EOF
+include::manifest/istio/infra-virtual-service.yml[]
+EOF
+----
+
+.Deploy bookinfo - workdir: bookinfo
+[source,shell]
+----
+skaffold run
+----
+
+.Apply virtual service
+[source,shell]
+----
+kubectl apply -f - <<EOF
+include::manifest/istio/book-info-virtual-service.yml[]
+EOF
+----
+
+== Test
+
+.Test bookinfo
+----
+http://bookinfo.example.com/productpage
+----
+
+.Kiali Page - You can see tracing data and Istio settings.
+----
+http://kiali.example.com
+----
+
+.Grafana Page - Metrics
+----
+http://grafana.example.com
+----
+
+== Furthermore
+
+. Enable or disable specific exporter features to gain more detailed insights or to avoid potential performance issues.
+. Add logging capabilities, for example by integrating with Grafana Loki to collect and query logs.
+. Instrument your application using OpenTelemetry to generate tracing data and visualize it in Jaeger.
+. Consider replacing Jaeger with Grafana Tempo for better integration within the Grafana ecosystem.
+. Explore storage solutions for Prometheus, such as Thanos, Cortex, or remote write options for long-term metric retention.
+
+== Reference
+
+[horizontal]
+Istio::
+* https://istio.io/latest/docs/setup/install/[Istio - Installation Guides]
+* https://github.com/istio/istio/tree/master/samples/bookinfo[Bookinfo Sample]
+
+Kubectl::
+* https://skaffold.dev/[skaffold]
+* https://github.com/kubernetes-sigs/kustomize[kustomize]
+
+Observability::
+* https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/kiali.yaml[kiali]
+* https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/prometheus.yaml[prometheus]
+* https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/grafana.yaml[grafana]
+* https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/jaeger.yaml[jaeger]
+
+Exporter::
+* https://github.com/prometheus/node_exporter[node_exporter]
+* https://github.com/kubernetes/kube-state-metrics[kube-state-metrics]
+* https://github.com/google/cadvisor[cadvisor]
+
+labels::
+* https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels[Recommended Labels]

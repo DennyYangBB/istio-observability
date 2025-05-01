@@ -1,0 +1,39 @@
+- op: add
+  path: /spec/template/spec/containers/0/resources
+  value:
+    limits:
+      memory: "1Gi"
+    requests:
+      cpu: "10m"
+      memory: "64Mi"
+
+- op: add
+  path: /spec/template/spec/containers/0/startupProbe
+  value:
+    httpGet:
+      path: /kiali/healthz
+      port: api-port
+      scheme: HTTP
+    initialDelaySeconds: 30
+    failureThreshold: 6
+    periodSeconds: 10
+
+- op: add
+  path: /spec/template/spec/containers/0/livenessProbe
+  value:
+    httpGet:
+      path: /kiali/healthz
+      port: api-port
+      scheme: HTTP
+    initialDelaySeconds: 5
+    periodSeconds: 30
+
+- op: add
+  path: /spec/template/spec/containers/0/readinessProbe
+  value:
+    httpGet:
+      path: /kiali/healthz
+      port: api-port
+      scheme: HTTP
+    initialDelaySeconds: 5
+    periodSeconds: 30

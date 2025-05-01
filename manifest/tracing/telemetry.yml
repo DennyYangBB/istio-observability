@@ -1,0 +1,12 @@
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: mesh-default
+  namespace: infra-dev
+spec:
+  selector:
+    matchLabels:
+      istio: ingressgateway
+  tracing:
+    - providers:
+        - name: otel-tracing

@@ -1,0 +1,19 @@
+labels:
+  - includeSelectors: false
+    includeTemplates: true
+    pairs:
+      app.kubernetes.io/component: server
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/instance: prometheus
+      app.kubernetes.io/version: v3.2.1
+      app.kubernetes.io/part-of: prometheus
+# https://github.com/appscode/third-party-tools/tree/master/monitoring/prometheus/builtin
+
+resources:
+  - service-account.yaml
+  - cluster-role.yaml
+  - cluster-role-binding.yaml
+  - config.yaml
+  - pod-disruption-budget.yaml
+  - deployment.yaml
+  - service.yaml
