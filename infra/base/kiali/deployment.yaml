@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kiali
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kiali
+      app.kubernetes.io/instance: kiali
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      name: kiali
+      labels:
+        sidecar.istio.io/inject: "false"
+      annotations:
+        checksum/config: bf68d54d762c82a262ec2c717f8acc32f59090f760339eb68831dbd0e4675436
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        kiali.io/dashboards: go,kiali
+    spec:
+      serviceAccountName: kiali
+      containers:
+        - name: kiali
+          image: "quay.io/kiali/kiali:v2.8"
+          imagePullPolicy: IfNotPresent
+          command:
+            - "/opt/kiali/kiali"
+            - "-config"
+            - "/kiali-configuration/config.yaml"
+          terminationMessagePolicy: FallbackToLogsOnError
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: api-port
+              containerPort: 20001
+            - name: http-metrics
+              containerPort: 9090
+          env:
+            - name: ACTIVE_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: LOG_LEVEL
+              value: "info"
+            - name: LOG_FORMAT
+              value: "text"
+            - name: LOG_TIME_FIELD_FORMAT
+              value: "2006-01-02T15:04:05Z07:00"
+            - name: LOG_SAMPLER_RATE
+              value: "1"
+          volumeMounts:
+            - name: kiali-configuration
+              mountPath: "/kiali-configuration"
+            - name: kiali-cert
+              mountPath: "/kiali-cert"
+            - name: kiali-secret
+              mountPath: "/kiali-secret"
+            - name: kiali-cabundle
+              mountPath: "/kiali-cabundle"
+          resources:
+            { }
+      volumes:
+        - name: kiali-configuration
+          configMap:
+            name: kiali
+        - name: kiali-cert
+          secret:
+            secretName: istio.kiali-service-account
+            optional: true
+        - name: kiali-secret
+          secret:
+            secretName: kiali
+            optional: true
+        - name: kiali-cabundle
+          configMap:
+            name: kiali-cabundle
+            optional: true

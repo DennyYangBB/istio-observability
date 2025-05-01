@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zipkin
+  labels:
+    name: zipkin
+spec:
+  ports:
+    - name: http-query
+      port: 9411
+      targetPort: 9411
+  selector:
+    app: jaeger

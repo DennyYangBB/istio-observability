@@ -1,0 +1,52 @@
+namespace: infra-dev
+labels:
+  - includeSelectors: false
+    includeTemplates: true
+    pairs:
+      app.kubernetes.io/environment: dev
+      app.kubernetes.io/part-of: infra-dev
+
+resources:
+  - ../../base/cadvisor/
+  - ../../base/kube-state-metrics/
+  - ../../base/node-exporter/
+  - ../../base/prometheus/
+  - ../../base/kiali/
+  - ../../base/grafana/
+  - ../../base/jaeger/
+
+patches:
+  - target: { group: apps, version: v1, kind: DaemonSet, name: cadvisor }
+    path: ./patch_time.yml
+  - target: { group: apps, version: v1, kind: DaemonSet, name: cadvisor }
+    path: ./patch/patch-cadvisor.yml
+
+  - target: { group: apps, version: v1, kind: Deployment, name: grafana }
+    path: ./patch_time.yml
+  - target: { group: apps, version: v1, kind: Deployment, name: grafana }
+    path: ./patch/patch-grafana.yml
+
+  - target: { group: apps, version: v1, kind: Deployment, name: jaeger }
+    path: ./patch_time.yml
+  - target: { group: apps, version: v1, kind: Deployment, name: jaeger }
+    path: ./patch/patch-jaeger.yml
+
+  - target: { group: apps, version: v1, kind: Deployment, name: kiali }
+    path: ./patch_time.yml
+  - target: { group: apps, version: v1, kind: Deployment, name: kiali }
+    path: ./patch/patch-kiali.yml
+
+  - target: { group: apps, version: v1, kind: DaemonSet, name: kube-state-metrics }
+    path: ./patch_time.yml
+  - target: { group: apps, version: v1, kind: DaemonSet, name: kube-state-metrics }
+    path: ./patch/patch-kube-state-metrics.yml
+
+  - target: { group: apps, version: v1, kind: DaemonSet, name: node-exporter }
+    path: ./patch_time.yml
+  - target: { group: apps, version: v1, kind: DaemonSet, name: node-exporter }
+    path: ./patch/patch-node-exporter.yml
+
+  - target: { group: apps, version: v1, kind: Deployment, name: prometheus }
+    path: ./patch_time.yml
+  - target: { group: apps, version: v1, kind: Deployment, name: prometheus }
+    path: ./patch/patch-prometheus.yml

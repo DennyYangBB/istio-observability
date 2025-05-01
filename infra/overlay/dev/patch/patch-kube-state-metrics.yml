@@ -1,0 +1,28 @@
+- op: add
+  path: /spec/template/spec/containers/0/resources
+  value:
+    requests:
+      cpu: "80m"
+      memory: "80Mi"
+    limits:
+      cpu: "80m"
+      memory: "80Mi"
+
+- op: add
+  path: /spec/template/spec/containers/0/livenessProbe
+  value:
+    httpGet:
+      path: /livez
+      port: http-metrics
+    initialDelaySeconds: 0
+    periodSeconds: 30
+    failureThreshold: 3
+
+- op: add
+  path: /spec/template/spec/containers/0/readinessProbe
+  value:
+    httpGet:
+      path: /readyz
+      port: telemetry
+    initialDelaySeconds: 5
+    periodSeconds: 30

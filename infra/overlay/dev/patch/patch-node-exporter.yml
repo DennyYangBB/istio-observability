@@ -1,0 +1,36 @@
+- op: add
+  path: /spec/template/spec/containers/0/resources
+  value:
+    requests:
+      cpu: "102m"
+      memory: "180Mi"
+    limits:
+      cpu: "250m"
+      memory: "180Mi"
+
+- op: add
+  path: /spec/template/spec/containers/0/startupProbe
+  value:
+    tcpSocket:
+      port: 9100
+    initialDelaySeconds: 15
+    failureThreshold: 6
+    periodSeconds: 10
+
+- op: add
+  path: /spec/template/spec/containers/0/livenessProbe
+  value:
+    tcpSocket:
+      port: 9100
+    initialDelaySeconds: 0
+    periodSeconds: 30
+    failureThreshold: 3
+
+- op: add
+  path: /spec/template/spec/containers/0/readinessProbe
+  value:
+    tcpSocket:
+      port: 9100
+    initialDelaySeconds: 5
+    periodSeconds: 30
+    failureThreshold: 3
