@@ -1,0 +1,15 @@
+labels:
+  - includeSelectors: false
+    includeTemplates: true
+    pairs:
+      app.kubernetes.io/component: exporter
+      app.kubernetes.io/name: node-exporter
+      app.kubernetes.io/instance: node-exporter
+      app.kubernetes.io/version: 1.9.1
+
+resources:
+  - service-account.yaml
+  - cluster-role.yaml
+  - cluster-role-binding.yaml
+  - network-policy.yaml
+  - daemonset.yaml

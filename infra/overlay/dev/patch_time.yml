@@ -1,0 +1,29 @@
+- op: add
+  path: /spec/template/spec/containers/0/volumeMounts/-
+  value:
+    mountPath: /etc/timezone
+    name: node-timezone
+    readOnly: true
+
+- op: add
+  path: /spec/template/spec/containers/0/volumeMounts/-
+  value:
+    mountPath: /etc/localtime
+    name: node-localtime
+    readOnly: true
+
+- op: add
+  path: /spec/template/spec/volumes/-
+  value:
+    name: node-timezone
+    hostPath:
+      path: /etc/timezone
+      type: File
+
+- op: add
+  path: /spec/template/spec/volumes/-
+  value:
+    name: node-localtime
+    hostPath:
+      path: /etc/localtime
+      type: File

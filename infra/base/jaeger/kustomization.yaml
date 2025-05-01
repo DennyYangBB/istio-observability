@@ -1,0 +1,8 @@
+# https://www.jaegertracing.io/
+
+resources:
+  - service-account.yaml
+  - deployment.yaml
+  - service-jaeger.yaml
+  - service-zipkin.yaml
+  - service-collector.yaml
